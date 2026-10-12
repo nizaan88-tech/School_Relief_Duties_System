@@ -1,0 +1,3135 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ஆசிரியர் பதில் பாட மேலாண்மை | Teacher Relief Management</title>
+  <style>
+/* ===== CSS Variables & Reset ===== */
+:root {
+  --primary: #1a5f4a;
+  --primary-dark: #0f3d30;
+  --primary-light: #2d8a6e;
+  --accent: #c9a227;
+  --accent-hover: #b8911f;
+  --danger: #c0392b;
+  --warning: #e67e22;
+  --success: #27ae60;
+  --info: #2980b9;
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --text: #1a1a2e;
+  --text-muted: #5a6a7a;
+  --border: #e0e6ed;
+  --sidebar-w: 280px;
+  --header-h: 70px;
+  --radius: 10px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+  --font-ta: 'Noto Sans Tamil', 'Inter', system-ui, sans-serif;
+  --font-en: 'Inter', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 15px; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-ta);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== Layout ===== */
+#app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary) 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-header {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-icon {
+  font-size: 1.8rem;
+  background: rgba(255,255,255,0.15);
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text h1 {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.logo-text p {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.sidebar-close {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.nav-menu {
+  flex: 1;
+  padding: 1rem 0.75rem;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  border-radius: 8px;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s;
+  font-size: 0.92rem;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+.nav-item.active {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-weight: 600;
+}
+
+.nav-icon { font-size: 1.15rem; width: 24px; text-align: center; }
+
+.sidebar-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  text-align: center;
+}
+
+.app-credit {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.top-header {
+  height: var(--header-h);
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.header-title { flex: 1; }
+.header-title h2 { font-size: 1.25rem; font-weight: 600; }
+.header-subtitle { font-size: 0.8rem; color: var(--text-muted); }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.day-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.day-selector label { font-size: 0.85rem; color: var(--text-muted); }
+
+.day-selector select {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--font-ta);
+  font-size: 0.9rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.date-display {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+}
+
+.pages { flex: 1; padding: 1.5rem; }
+
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.25s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.app-footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  background: var(--card);
+}
+
+/* ===== Cards & Components ===== */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  margin-bottom: 1.25rem;
+}
+
+.card-header h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.card-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border: none;
+  border-radius: 7px;
+  font-family: var(--font-ta);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+
+.btn-secondary {
+  background: var(--info);
+  color: #fff;
+}
+.btn-secondary:hover:not(:disabled) { background: #1f6a9a; }
+
+.btn-accent {
+  background: var(--accent);
+  color: #1a1a2e;
+}
+.btn-accent:hover:not(:disabled) { background: var(--accent-hover); }
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.btn-outline:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-danger:hover:not(:disabled) { background: #a93226; }
+
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+}
+
+.btn-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Dashboard */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--primary);
+  transition: transform 0.2s;
+}
+
+.stat-card:hover { transform: translateY(-2px); }
+
+.stat-card.accent { border-left-color: var(--accent); }
+.stat-card.danger { border-left-color: var(--danger); }
+.stat-card.success { border-left-color: var(--success); }
+.stat-card.warning { border-left-color: var(--warning); }
+.stat-card.info { border-left-color: var(--info); }
+
+.stat-card .stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.stat-card .stat-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+/* Upload Zone */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  background: #fafbfc;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.upload-zone.dragover {
+  border-color: var(--primary);
+  background: rgba(26, 95, 74, 0.05);
+}
+
+.upload-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+.upload-text { font-size: 1rem; margin-bottom: 0.35rem; }
+.upload-hint { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; }
+
+.upload-status {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+}
+
+.upload-status.error {
+  background: #fce8e6;
+  border-color: #f5c6cb;
+}
+
+.validation-summary {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.val-item {
+  background: var(--bg);
+  padding: 0.75rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.val-item .val-num {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.val-item .val-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Tables */
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.data-table th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+}
+
+.data-table td {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(26, 95, 74, 0.04);
+}
+
+.data-table tbody tr:nth-child(even) {
+  background: #fafbfc;
+}
+
+.data-table tbody tr:nth-child(even):hover {
+  background: rgba(26, 95, 74, 0.06);
+}
+
+/* Search & Filters */
+.search-input {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-family: var(--font-ta);
+  font-size: 0.9rem;
+  width: 100%;
+  max-width: 320px;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(26, 95, 74, 0.15);
+}
+
+.filter-bar {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.filter-chip {
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.filter-chip:hover, .filter-chip.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* Absent Teachers */
+.absent-controls {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.selected-count {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.teacher-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.5rem;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fafbfc;
+}
+
+.teacher-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.teacher-item:hover {
+  border-color: var(--primary-light);
+  background: rgba(26, 95, 74, 0.04);
+}
+
+.teacher-item.selected {
+  border-color: var(--primary);
+  background: rgba(26, 95, 74, 0.1);
+}
+
+.teacher-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.teacher-item .t-name {
+  font-size: 0.9rem;
+  flex: 1;
+}
+
+.absent-actions {
+  margin-top: 1.25rem;
+  text-align: right;
+}
+
+/* Relief Assignment */
+.relief-period-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.relief-period-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: #fff;
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.relief-period-header h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.relief-meta {
+  font-size: 0.85rem;
+  opacity: 0.95;
+}
+
+.relief-period-body {
+  padding: 1.25rem;
+}
+
+.candidate-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.candidate-table-wrap {
+  overflow-x: auto;
+}
+
+.candidate-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.candidate-table th {
+  background: #eef2f5;
+  padding: 0.6rem 0.7rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--border);
+}
+
+.candidate-table td {
+  padding: 0.55rem 0.7rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.candidate-table tr:hover { background: rgba(26, 95, 74, 0.04); }
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-free { background: #d4edda; color: #155724; }
+.badge-teaching { background: #f8d7da; color: #721c24; }
+.badge-relief { background: #fff3cd; color: #856404; }
+.badge-absent { background: #e2e3e5; color: #383d41; }
+.badge-recommended { background: #cce5ff; color: #004085; }
+.badge-available { background: #d1ecf1; color: #0c5460; }
+.badge-conflict { background: #f8d7da; color: #721c24; }
+.badge-assigned { background: #d4edda; color: #155724; }
+.badge-pending { background: #fff3cd; color: #856404; }
+.badge-skipped { background: #e2e3e5; color: #383d41; }
+
+.match-yes { color: var(--success); font-weight: 700; }
+.match-no { color: var(--text-muted); }
+
+.select-btn {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: var(--font-ta);
+}
+
+.select-btn:hover { background: var(--primary-dark); }
+.select-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Mobile Candidate Cards */
+.candidate-cards {
+  display: none;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.candidate-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  background: #fff;
+}
+
+.candidate-card.recommended {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(26, 95, 74, 0.15);
+}
+
+.candidate-card .cc-name {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.candidate-card .cc-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  padding: 0.2rem 0;
+  color: var(--text-muted);
+}
+
+.candidate-card .cc-row span:last-child {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.assigned-info {
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.no-teacher-msg {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.no-teacher-msg h4 {
+  color: #856404;
+  margin-bottom: 0.5rem;
+}
+
+/* Reports */
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.report-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-ta);
+}
+
+.report-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.report-icon { font-size: 1.6rem; display: block; margin-bottom: 0.5rem; }
+.report-title { font-weight: 600; font-size: 0.95rem; display: block; }
+.report-desc { font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 0.2rem; }
+
+.report-output {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+/* Settings */
+.settings-form fieldset {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.settings-form legend {
+  font-weight: 600;
+  padding: 0 0.5rem;
+  color: var(--primary);
+}
+
+.form-row {
+  margin-bottom: 0.9rem;
+}
+
+.form-row label {
+  display: block;
+  font-size: 0.88rem;
+  margin-bottom: 0.3rem;
+  color: var(--text-muted);
+}
+
+.form-row input[type="text"],
+.form-row input[type="number"] {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--font-ta);
+  font-size: 0.9rem;
+}
+
+.checkbox-row label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.form-actions { margin-top: 1rem; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn 0.25s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 { font-size: 1.1rem; }
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.modal-body { padding: 1.25rem; }
+
+.modal-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.confirm-detail {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0.4rem 1rem;
+  font-size: 0.9rem;
+}
+
+.confirm-detail .label { color: var(--text-muted); }
+.confirm-detail .value { font-weight: 500; }
+
+/* Toast */
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toast {
+  background: var(--text);
+  color: #fff;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-lg);
+  animation: toastIn 0.3s ease;
+  max-width: 360px;
+}
+
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+.toast.warning { background: var(--warning); }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--text-muted);
+}
+
+.empty-state p { margin-bottom: 1rem; }
+
+/* History */
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: #fff;
+}
+
+.history-item:hover {
+  border-color: var(--primary);
+  background: rgba(26, 95, 74, 0.04);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.pagination button {
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: var(--font-ta);
+}
+
+.pagination button.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.pagination button:hover:not(.active) {
+  border-color: var(--primary);
+}
+
+/* Print Area */
+.logo-upload-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.logo-preview-wrap { margin-top: 0.5rem; }
+.relief-period-block.pending-focus {
+  box-shadow: 0 0 0 3px var(--accent), 0 8px 28px rgba(201, 162, 39, 0.25);
+  border-color: var(--accent);
+  transition: box-shadow 0.35s ease;
+}
+.relief-period-block {
+  scroll-margin-top: 90px;
+}
+.print-area { display: none; }
+
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area {
+    display: block !important;
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%;
+    padding: 1.5cm;
+    font-size: 11pt;
+  }
+  .print-area table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .print-area th, .print-area td {
+    border: 1px solid #333;
+    padding: 6px 8px;
+    text-align: left;
+  }
+  .print-area th { background: #eee !important; -webkit-print-color-adjust: exact; }
+  .no-print { display: none !important; }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-close { display: block; }
+  .main-content { margin-left: 0; }
+  .menu-toggle { display: block; }
+  .header-actions { flex-wrap: wrap; }
+  .day-selector { order: 3; width: 100%; }
+}
+
+@media (max-width: 700px) {
+  .pages { padding: 1rem; }
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .candidate-table-wrap { display: none; }
+  .candidate-cards { display: flex; }
+  .teacher-list {
+    grid-template-columns: 1fr;
+  }
+  .flex-between { flex-direction: column; }
+  .confirm-detail {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .stat-card .stat-value { font-size: 1.5rem; }
+}
+
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-area">
+          <div class="logo-icon">📚</div>
+          <div class="logo-text">
+            <h1>ஆசிரியர் பதில் பாட</h1>
+            <p>மேலாண்மை</p>
+          </div>
+        </div>
+        <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">×</button>
+      </div>
+      <nav class="nav-menu">
+        <a href="#dashboard" class="nav-item active" data-page="dashboard">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">முகப்பு</span>
+        </a>
+        <a href="#timetable" class="nav-item" data-page="timetable">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">Master Timetable</span>
+        </a>
+        <a href="#absent" class="nav-item" data-page="absent">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">வராத ஆசிரியர்கள்</span>
+        </a>
+        <a href="#relief" class="nav-item" data-page="relief">
+          <span class="nav-icon">🔄</span>
+          <span class="nav-label">பதில் பாட ஒழுங்கு</span>
+        </a>
+        <a href="#teacher-report" class="nav-item" data-page="teacher-report">
+          <span class="nav-icon">👨‍🏫</span>
+          <span class="nav-label">ஆசிரியர் வாரியான அட்டவணை</span>
+        </a>
+        <a href="#reports" class="nav-item" data-page="reports">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">அறிக்கைகள்</span>
+        </a>
+        <a href="#history" class="nav-item" data-page="history">
+          <span class="nav-icon">📅</span>
+          <span class="nav-label">வரலாறு</span>
+        </a>
+        <a href="#settings" class="nav-item" data-page="settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">அமைப்புகள்</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <p class="app-credit">App designed by M.Nishanthan</p>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="top-header">
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
+        <div class="header-title">
+          <h2 id="pageTitle">முகப்பு</h2>
+          <p class="header-subtitle" id="pageSubtitle">Teacher Relief / Substitute Period Management System</p>
+        </div>
+        <div class="header-actions">
+          <div class="day-selector">
+            <label for="workingDay">நாள்:</label>
+            <select id="workingDay">
+              <option value="Monday">திங்கள் / Monday</option>
+              <option value="Tuesday">செவ்வாய் / Tuesday</option>
+              <option value="Wednesday">புதன் / Wednesday</option>
+              <option value="Thursday">வியாழன் / Thursday</option>
+              <option value="Friday">வெள்ளி / Friday</option>
+            </select>
+          </div>
+          <div class="date-display" id="currentDate"></div>
+        </div>
+      </header>
+
+      <!-- Pages Container -->
+      <div class="pages">
+        <!-- Dashboard Page -->
+        <section id="page-dashboard" class="page active">
+          <div class="dashboard-grid" id="dashboardCards"></div>
+          <div class="dashboard-actions">
+            <button class="btn btn-primary" onclick="App.navigate('timetable')">
+              📤 Master Timetable Upload
+            </button>
+            <button class="btn btn-secondary" onclick="App.navigate('absent')">
+              👤 வராத ஆசிரியர்கள்
+            </button>
+            <button class="btn btn-accent" onclick="App.navigate('relief')">
+              🔄 பதில் பாட ஒழுங்கு
+            </button>
+          </div>
+          <div class="quick-stats" id="quickStats"></div>
+        </section>
+
+        <!-- Master Timetable Page -->
+        <section id="page-timetable" class="page">
+          <div class="card">
+            <div class="card-header">
+              <h3>Master Timetable Upload</h3>
+              <p>Excel கோப்பை பதிவேற்றி Master Timetable-ஐ அமைக்கவும்</p>
+            </div>
+            <div class="upload-zone" id="uploadZone">
+              <div class="upload-icon">📁</div>
+              <p class="upload-text">Excel கோப்பை இங்கே இழுத்து விடவும் அல்லது Browse செய்யவும்</p>
+              <p class="upload-hint">.xlsx அல்லது .xls | Tamil Unicode பாதுகாக்கப்படும்</p>
+              <input type="file" id="excelFile" accept=".xlsx,.xls" hidden />
+              <button class="btn btn-primary" onclick="document.getElementById('excelFile').click()">Browse File</button>
+            </div>
+            <div class="upload-status" id="uploadStatus" style="display:none;"></div>
+            <div class="validation-summary" id="validationSummary" style="display:none;"></div>
+            <div class="timetable-preview" id="timetablePreview" style="display:none;">
+              <div class="preview-header">
+                <h4>Timetable Preview</h4>
+                <div class="preview-actions">
+                  <input type="text" id="ttSearch" placeholder="தேடுக... Teacher / Subject / Class" class="search-input" />
+                  <select id="ttDayFilter">
+                    <option value="">அனைத்து நாட்கள்</option>
+                    <option value="Monday">திங்கள்</option>
+                    <option value="Tuesday">செவ்வாய்</option>
+                    <option value="Wednesday">புதன்</option>
+                    <option value="Thursday">வியாழன்</option>
+                    <option value="Friday">வெள்ளி</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-wrapper">
+                <table class="data-table" id="ttTable">
+                  <thead>
+                    <tr>
+                      <th>தொடர் இலக்கம்</th>
+                      <th>ஆசிரியரின் பெயர்</th>
+                      <th>பாட வேளை</th>
+                      <th>கற்பிக்கும் பாடம்</th>
+                      <th>வகுப்பு</th>
+                      <th>நாள்</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div class="pagination" id="ttPagination"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Absent Teachers Page -->
+        <section id="page-absent" class="page">
+          <div class="card">
+            <div class="card-header">
+              <h3>இன்று வராத ஆசிரியர்கள்</h3>
+              <p>வராத ஆசிரியர்களைத் தேர்ந்தெடுக்கவும்</p>
+            </div>
+            <div class="absent-controls">
+              <input type="text" id="absentSearch" placeholder="ஆசிரியர் பெயரைத் தேடுக..." class="search-input" />
+              <div class="btn-group">
+                <button class="btn btn-sm" id="selectAllAbsent">Select All</button>
+                <button class="btn btn-sm btn-outline" id="clearAllAbsent">Clear All</button>
+              </div>
+              <span class="selected-count" id="selectedAbsentCount">0 selected</span>
+            </div>
+            <div class="teacher-list" id="absentTeacherList"></div>
+            <div class="absent-actions">
+              <button class="btn btn-primary" id="proceedToRelief" disabled>
+                பதில் பாட ஒழுங்குக்கு செல்ல →
+              </button>
+            </div>
+          </div>
+          <div class="card" id="absentPeriodsCard" style="display:none;">
+            <div class="card-header">
+              <h3>வராத ஆசிரியர்களின் பாட வேளைகள்</h3>
+            </div>
+            <div id="absentPeriodsContent"></div>
+          </div>
+        </section>
+
+        <!-- Relief Assignment Page -->
+        <section id="page-relief" class="page">
+          <div class="card">
+            <div class="card-header flex-between">
+              <div>
+                <h3>பதில் பாட ஒழுங்கு</h3>
+                <p>Relief Assignment – Auto-detect & Assign</p>
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-outline" id="refreshRelief">🔄 Refresh</button>
+                <button class="btn btn-accent" id="printReliefBtn">🖨️ Print Relief Timetable</button>
+              </div>
+            </div>
+            <div id="reliefContent">
+              <div class="empty-state">
+                <p>முதலில் Master Timetable பதிவேற்றி, வராத ஆசிரியர்களைத் தேர்ந்தெடுக்கவும்.</p>
+                <button class="btn btn-primary" onclick="App.navigate('absent')">வராத ஆசிரியர்கள்</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Teacher-wise Report Page -->
+        <section id="page-teacher-report" class="page">
+          <div class="card">
+            <div class="card-header flex-between">
+              <div>
+                <h3>ஆசிரியர் வாரியான பதில் பாட அட்டவணை</h3>
+                <p>Relief Teacher-wise Schedule</p>
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-outline" id="exportTeacherExcel">📊 Excel</button>
+                <button class="btn btn-outline" id="printTeacherReport">🖨️ Print</button>
+              </div>
+            </div>
+            <div class="filter-bar">
+              <input type="text" id="teacherReportSearch" placeholder="ஆசிரியர் தேடுக..." class="search-input" />
+            </div>
+            <div id="teacherReportContent"></div>
+          </div>
+        </section>
+
+        <!-- Reports Page -->
+        <section id="page-reports" class="page">
+          <div class="card">
+            <div class="card-header">
+              <h3>அறிக்கைகள்</h3>
+              <p>Reports & Analytics</p>
+            </div>
+            <div class="reports-grid">
+              <button class="report-card" data-report="daily">
+                <span class="report-icon">📅</span>
+                <span class="report-title">Daily Relief Report</span>
+                <span class="report-desc">இன்றைய பதில் பாட அறிக்கை</span>
+              </button>
+              <button class="report-card" data-report="teacher">
+                <span class="report-icon">👨‍🏫</span>
+                <span class="report-title">Teacher-wise Relief</span>
+                <span class="report-desc">ஆசிரியர் வாரியான அறிக்கை</span>
+              </button>
+              <button class="report-card" data-report="absent">
+                <span class="report-icon">👤</span>
+                <span class="report-title">Absent Teacher Report</span>
+                <span class="report-desc">வராத ஆசிரியர் வாரியான அறிக்கை</span>
+              </button>
+              <button class="report-card" data-report="period">
+                <span class="report-icon">⏰</span>
+                <span class="report-title">Period-wise Report</span>
+                <span class="report-desc">பாடவேளை வாரியான அறிக்கை</span>
+              </button>
+              <button class="report-card" data-report="workload">
+                <span class="report-icon">📈</span>
+                <span class="report-title">Teacher Workload</span>
+                <span class="report-desc">ஆசிரியர் பணிச்சுமை அறிக்கை</span>
+              </button>
+              <button class="report-card" data-report="pending">
+                <span class="report-icon">⏳</span>
+                <span class="report-title">Pending Relief</span>
+                <span class="report-desc">நிலுவையில் உள்ள பதில் பாடங்கள்</span>
+              </button>
+              <button class="report-card" data-report="conflict">
+                <span class="report-icon">⚠️</span>
+                <span class="report-title">Conflict Report</span>
+                <span class="report-desc">முரண்பாடு அறிக்கை</span>
+              </button>
+              <button class="report-card" data-report="history">
+                <span class="report-icon">📜</span>
+                <span class="report-title">Historical Relief</span>
+                <span class="report-desc">வரலாற்று அறிக்கை</span>
+              </button>
+            </div>
+            <div id="reportOutput" class="report-output" style="display:none;"></div>
+          </div>
+        </section>
+
+        <!-- History Page -->
+        <section id="page-history" class="page">
+          <div class="card">
+            <div class="card-header">
+              <h3>வரலாறு</h3>
+              <p>Daily Relief History</p>
+            </div>
+            <div class="history-list" id="historyList"></div>
+            <div id="historyDetail" style="display:none;"></div>
+          </div>
+        </section>
+
+        <!-- Settings Page -->
+        <section id="page-settings" class="page">
+          <div class="card">
+            <div class="card-header">
+              <h3>அமைப்புகள்</h3>
+              <p>Settings</p>
+            </div>
+            <form id="settingsForm" class="settings-form">
+              <fieldset>
+                <legend>School Information</legend>
+                <div class="form-row">
+                  <label>School Name / பாடசாலை பெயர்</label>
+                  <input type="text" id="schoolName" value="Sri Lankan School" />
+                </div>
+                <div class="form-row">
+                  <label>School Address</label>
+                  <input type="text" id="schoolAddress" value="" />
+                </div>
+                <div class="form-row">
+                  <label>Principal Name</label>
+                  <input type="text" id="principalName" value="" />
+                </div>
+                <div class="form-row">
+                  <label>Deputy Principal Name</label>
+                  <input type="text" id="deputyPrincipalName" value="" />
+                </div>
+                <div class="form-row">
+                  <label>School Logo / பாடசாலை Logo</label>
+                  <div class="logo-upload-row">
+                    <input type="file" id="schoolLogoFile" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" />
+                    <button type="button" class="btn btn-sm btn-outline" id="removeLogoBtn">Logo நீக்குக</button>
+                  </div>
+                  <div id="logoPreviewWrap" class="logo-preview-wrap" style="display:none;margin-top:0.75rem;">
+                    <img id="logoPreview" alt="School Logo" style="max-height:80px;max-width:180px;border:1px solid var(--border);border-radius:6px;padding:4px;background:#fff;" />
+                  </div>
+                  <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.35rem;">PNG / JPG / WebP – Print & PDF-ல் தோன்றும்</p>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>Timetable Settings</legend>
+                <div class="form-row">
+                  <label>Number of Periods</label>
+                  <input type="number" id="numPeriods" min="1" max="12" value="8" />
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>Relief Settings</legend>
+                <div class="form-row">
+                  <label>Maximum Relief Periods per Teacher per Day</label>
+                  <input type="number" id="maxRelief" min="1" max="8" value="3" />
+                </div>
+                <div class="form-row checkbox-row">
+                  <label><input type="checkbox" id="prefSameSubject" checked /> Same Subject Preference</label>
+                </div>
+                <div class="form-row checkbox-row">
+                  <label><input type="checkbox" id="prefSameGrade" checked /> Same Grade Preference</label>
+                </div>
+                <div class="form-row checkbox-row">
+                  <label><input type="checkbox" id="prefLeastLoaded" checked /> Least-loaded Teacher Preference</label>
+                </div>
+              </fieldset>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">சேமிக்க / Save Settings</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </div>
+
+      <footer class="app-footer">
+        <p>App designed by M.Nishanthan</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Modals -->
+  <div class="modal-overlay" id="modalOverlay" style="display:none;">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Confirm</h3>
+        <button class="modal-close" id="modalClose">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer" id="modalFooter"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Print Area (hidden) -->
+  <div id="printArea" class="print-area"></div>
+
+  <script>
+/**
+ * ஆசிரியர் பதில் பாட மேலாண்மை
+ * Teacher Relief / Substitute Period Management System
+ * App designed by M.Nishanthan
+ */
+
+const App = (() => {
+  // ===== State =====
+  const state = {
+    masterTimetable: [],      // {id, teacher, period, subject, class, day}
+    teachers: [],             // unique teacher names
+    subjects: new Set(),
+    classes: new Set(),
+    absentTeachers: new Set(),
+    reliefAssignments: [],    // {id, date, day, period, absentTeacher, subject, class, reliefTeacher, status, assignedAt, assignedBy}
+    history: {},              // dateKey -> {day, assignments, absentTeachers}
+    settings: {
+      schoolName: 'Sri Lankan School',
+      schoolAddress: '',
+      principalName: '',
+      deputyPrincipalName: '',
+      schoolLogo: '',
+      numPeriods: 8,
+      maxRelief: 3,
+      prefSameSubject: true,
+      prefSameGrade: true,
+      prefLeastLoaded: true
+    },
+    currentDay: 'Monday',
+    currentDate: null,
+    currentPage: 'dashboard',
+    ttPage: 1,
+    ttPageSize: 50
+  };
+
+  const DAYS = {
+    Monday: 'திங்கள்',
+    Tuesday: 'செவ்வாய்',
+    Wednesday: 'புதன்',
+    Thursday: 'வியாழன்',
+    Friday: 'வெள்ளி'
+  };
+
+  const EXPECTED_COLS = [
+    'தொடர் இலக்கம்',
+    'ஆசிரியரின் பெயர்',
+    'பாட வேளை',
+    'கற்பிக்கும் பாடம்',
+    'வகுப்பு'
+  ];
+
+  // ===== Persistence =====
+  function save() {
+    try {
+      const data = {
+        masterTimetable: state.masterTimetable,
+        teachers: state.teachers,
+        subjects: [...state.subjects],
+        classes: [...state.classes],
+        absentTeachers: [...state.absentTeachers],
+        reliefAssignments: state.reliefAssignments,
+        history: state.history,
+        settings: state.settings,
+        currentDay: state.currentDay
+      };
+      localStorage.setItem('teacherReliefApp', JSON.stringify(data));
+    } catch (e) {
+      console.warn('Save failed', e);
+    }
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem('teacherReliefApp');
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      state.masterTimetable = data.masterTimetable || [];
+      state.teachers = data.teachers || [];
+      state.subjects = new Set(data.subjects || []);
+      state.classes = new Set(data.classes || []);
+      state.absentTeachers = new Set(data.absentTeachers || []);
+      state.reliefAssignments = data.reliefAssignments || [];
+      state.history = data.history || {};
+      state.settings = { ...state.settings, ...(data.settings || {}) };
+      state.currentDay = data.currentDay || 'Monday';
+    } catch (e) {
+      console.warn('Load failed', e);
+    }
+  }
+
+  // ===== Utils =====
+  function todayKey() {
+    const d = state.currentDate || new Date();
+    return d.toISOString().slice(0, 10);
+  }
+
+  function formatDate(d) {
+    if (!d) d = new Date();
+    const opts = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+    return d.toLocaleDateString('en-LK', opts);
+  }
+
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function isFree(subject, cls) {
+    const s = String(subject || '').trim();
+    const c = String(cls || '').trim();
+    return (s === '-' || s === '' || s === '–') && (c === '-' || c === '' || c === '–');
+  }
+
+  function toast(msg, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+
+  function showModal(title, bodyHtml, footerHtml) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').innerHTML = bodyHtml;
+    document.getElementById('modalFooter').innerHTML = footerHtml;
+    document.getElementById('modalOverlay').style.display = 'flex';
+  }
+
+  function hideModal() {
+    document.getElementById('modalOverlay').style.display = 'none';
+  }
+
+  // ===== Navigation =====
+  function navigate(page) {
+    state.currentPage = page;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const pageEl = document.getElementById(`page-${page}`);
+    if (pageEl) pageEl.classList.add('active');
+    const navEl = document.querySelector(`.nav-item[data-page="${page}"]`);
+    if (navEl) navEl.classList.add('active');
+
+    const titles = {
+      dashboard: ['முகப்பு', 'Teacher Relief / Substitute Period Management System'],
+      timetable: ['Master Timetable', 'Excel Upload & Preview'],
+      absent: ['வராத ஆசிரியர்கள்', 'Select Absent Teachers'],
+      relief: ['பதில் பாட ஒழுங்கு', 'Relief Assignment'],
+      'teacher-report': ['ஆசிரியர் வாரியான அட்டவணை', 'Teacher-wise Relief Schedule'],
+      reports: ['அறிக்கைகள்', 'Reports & Analytics'],
+      history: ['வரலாறு', 'Daily Relief History'],
+      settings: ['அமைப்புகள்', 'Settings']
+    };
+    const t = titles[page] || ['', ''];
+    document.getElementById('pageTitle').textContent = t[0];
+    document.getElementById('pageSubtitle').textContent = t[1];
+
+    // Close mobile sidebar
+    document.getElementById('sidebar').classList.remove('open');
+
+    // Render page content
+    if (page === 'dashboard') renderDashboard();
+    else if (page === 'timetable') renderTimetablePage();
+    else if (page === 'absent') renderAbsentPage();
+    else if (page === 'relief') renderReliefPage();
+    else if (page === 'teacher-report') renderTeacherReport();
+    else if (page === 'history') renderHistory();
+    else if (page === 'settings') renderSettings();
+  }
+
+  // ===== Dashboard =====
+  function getDashboardStats() {
+    const day = state.currentDay;
+    const tt = state.masterTimetable.filter(r => !r.day || r.day === day);
+    const teachers = new Set(tt.map(r => r.teacher));
+    const freeCount = tt.filter(r => isFree(r.subject, r.class)).length;
+    const teachingCount = tt.filter(r => !isFree(r.subject, r.class)).length;
+
+    const absent = [...state.absentTeachers];
+    let required = 0;
+    const periodsNeeded = [];
+    absent.forEach(t => {
+      tt.filter(r => r.teacher === t && !isFree(r.subject, r.class)).forEach(r => {
+        required++;
+        periodsNeeded.push({ teacher: t, period: r.period, subject: r.subject, class: r.class });
+      });
+    });
+
+    const todayAssignments = state.reliefAssignments.filter(a => a.date === todayKey() && a.day === day && a.status !== 'Cancelled');
+    const assigned = todayAssignments.filter(a => a.status === 'Assigned' || a.status === 'Confirmed' || a.status === 'Skipped').length;
+    const pending = required - assigned;
+    const freeTeachers = teachers.size - absent.length;
+    const reliefTeachers = new Set(todayAssignments.map(a => a.reliefTeacher)).size;
+    const conflicts = 0; // computed on demand
+
+    return {
+      totalTeachers: teachers.size,
+      totalRecords: tt.length,
+      freePeriods: freeCount,
+      teachingPeriods: teachingCount,
+      absentCount: absent.length,
+      required,
+      assigned,
+      pending: Math.max(0, pending),
+      freeTeachers: Math.max(0, freeTeachers),
+      reliefTeachers,
+      conflicts,
+      completed: assigned
+    };
+  }
+
+  function renderDashboard() {
+    const s = getDashboardStats();
+    const cards = [
+      { label: 'Total Teachers', value: s.totalTeachers, cls: '' },
+      { label: 'Timetable Records', value: s.totalRecords, cls: 'info' },
+      { label: "Today's Absent Teachers", value: s.absentCount, cls: 'danger' },
+      { label: 'Relief Periods Required', value: s.required, cls: 'warning' },
+      { label: 'Relief Periods Assigned', value: s.assigned, cls: 'success' },
+      { label: 'Pending Relief Periods', value: s.pending, cls: 'warning' },
+      { label: 'Available Free Teachers', value: s.freeTeachers, cls: 'info' },
+      { label: 'Teachers Already Assigned Relief', value: s.reliefTeachers, cls: 'accent' },
+      { label: 'Completed Assignments', value: s.completed, cls: 'success' }
+    ];
+    document.getElementById('dashboardCards').innerHTML = cards.map(c => `
+      <div class="stat-card ${c.cls}">
+        <div class="stat-value">${c.value}</div>
+        <div class="stat-label">${c.label}</div>
+      </div>
+    `).join('');
+  }
+
+  // ===== Excel Upload =====
+  function handleFile(file) {
+    if (!file) return;
+    const status = document.getElementById('uploadStatus');
+    status.style.display = 'block';
+    status.className = 'upload-status';
+    status.innerHTML = `<p>Uploading & parsing: <strong>${file.name}</strong>...</p>`;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const wb = XLSX.read(data, { type: 'array', codepage: 65001 });
+        const sheetName = wb.SheetNames[0];
+        const sheet = wb.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false });
+
+        if (rows.length < 2) {
+          throw new Error('Excel file is empty or has no data rows.');
+        }
+
+        // Detect header row
+        let headerRow = rows[0].map(c => String(c).trim());
+        let dataStart = 1;
+
+        // Check if columns match expected (flexible matching)
+        const colMap = {};
+        const expectedNorm = EXPECTED_COLS.map(c => c.trim());
+        headerRow.forEach((h, i) => {
+          const hn = h.trim();
+          expectedNorm.forEach((exp, ei) => {
+            if (hn === exp || hn.includes(exp.slice(0, 6)) || exp.includes(hn.slice(0, 6))) {
+              colMap[ei] = i;
+            }
+          });
+        });
+
+        // Fallback: assume order if headers not perfectly matched
+        if (Object.keys(colMap).length < 3) {
+          // Assume first 5 columns in order
+          for (let i = 0; i < 5; i++) colMap[i] = i;
+          // Check if first row looks like headers
+          const first = String(rows[0][0] || '');
+          if (first.includes('தொடர்') || first.toLowerCase().includes('serial') || first === '1' || !isNaN(Number(first))) {
+            // might be data starting from row 0 or header
+            if (isNaN(Number(first)) || first.includes('தொடர்')) {
+              dataStart = 1;
+            } else {
+              dataStart = 0;
+            }
+          }
+        }
+
+        const records = [];
+        const teachersSet = new Set();
+        const subjectsSet = new Set();
+        const classesSet = new Set();
+        let freeCount = 0;
+
+        for (let i = dataStart; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row || row.length === 0) continue;
+
+          const id = String(row[colMap[0] ?? 0] ?? '').trim();
+          const teacher = String(row[colMap[1] ?? 1] ?? '').trim();
+          const period = String(row[colMap[2] ?? 2] ?? '').trim();
+          const subject = String(row[colMap[3] ?? 3] ?? '').trim();
+          const cls = String(row[colMap[4] ?? 4] ?? '').trim();
+
+          if (!teacher) continue;
+
+          // Optional day column (6th)
+          let day = state.currentDay;
+          if (row.length > 5 && row[5]) {
+            const d = String(row[5]).trim().toLowerCase();
+            if (d.includes('mon') || d.includes('திங்')) day = 'Monday';
+            else if (d.includes('tue') || d.includes('செவ்')) day = 'Tuesday';
+            else if (d.includes('wed') || d.includes('புத')) day = 'Wednesday';
+            else if (d.includes('thu') || d.includes('வியா')) day = 'Thursday';
+            else if (d.includes('fri') || d.includes('வெள்')) day = 'Friday';
+          }
+
+          records.push({
+            id: id || String(records.length + 1),
+            teacher,
+            period,
+            subject: subject || '-',
+            class: cls || '-',
+            day
+          });
+
+          teachersSet.add(teacher);
+          if (!isFree(subject, cls)) {
+            if (subject && subject !== '-') subjectsSet.add(subject);
+            if (cls && cls !== '-') classesSet.add(cls);
+          } else {
+            freeCount++;
+          }
+        }
+
+        if (records.length === 0) {
+          throw new Error('No valid timetable records found. Please check column order: தொடர் இலக்கம் | ஆசிரியரின் பெயர் | பாட வேளை | கற்பிக்கும் பாடம் | வகுப்பு');
+        }
+
+        // Replace master timetable
+        state.masterTimetable = records;
+        state.teachers = [...teachersSet].sort((a, b) => a.localeCompare(b, 'ta'));
+        state.subjects = subjectsSet;
+        state.classes = classesSet;
+
+        // Clear current day's absences & assignments when new TT uploaded (keep history)
+        state.absentTeachers.clear();
+        state.reliefAssignments = state.reliefAssignments.filter(a => a.date !== todayKey());
+
+        save();
+
+        status.className = 'upload-status';
+        status.innerHTML = `
+          <p>✅ <strong>${file.name}</strong> uploaded successfully!</p>
+          <p>Tamil Unicode preserved. Master Timetable updated.</p>
+        `;
+
+        const summary = document.getElementById('validationSummary');
+        summary.style.display = 'grid';
+        summary.innerHTML = `
+          <div class="val-item"><div class="val-num">${records.length}</div><div class="val-label">Records</div></div>
+          <div class="val-item"><div class="val-num">${teachersSet.size}</div><div class="val-label">Teachers</div></div>
+          <div class="val-item"><div class="val-num">${classesSet.size}</div><div class="val-label">Classes</div></div>
+          <div class="val-item"><div class="val-num">${subjectsSet.size}</div><div class="val-label">Subjects</div></div>
+          <div class="val-item"><div class="val-num">${freeCount}</div><div class="val-label">Free Periods</div></div>
+        `;
+
+        document.getElementById('timetablePreview').style.display = 'block';
+        state.ttPage = 1;
+        renderTimetableTable();
+        toast('Master Timetable uploaded successfully', 'success');
+        renderDashboard();
+      } catch (err) {
+        status.className = 'upload-status error';
+        status.innerHTML = `
+          <p>❌ Upload failed</p>
+          <p>${err.message}</p>
+          <p style="margin-top:0.5rem;font-size:0.85rem;">Expected columns (in order):<br>
+          1. தொடர் இலக்கம்<br>
+          2. ஆசிரியரின் பெயர்<br>
+          3. பாட வேளை<br>
+          4. கற்பிக்கும் பாடம்<br>
+          5. வகுப்பு</p>
+        `;
+        toast(err.message, 'error');
+      }
+    };
+    reader.onerror = () => {
+      status.className = 'upload-status error';
+      status.innerHTML = '<p>❌ File read error</p>';
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function renderTimetablePage() {
+    if (state.masterTimetable.length > 0) {
+      document.getElementById('timetablePreview').style.display = 'block';
+      document.getElementById('validationSummary').style.display = 'grid';
+      const freeCount = state.masterTimetable.filter(r => isFree(r.subject, r.class)).length;
+      document.getElementById('validationSummary').innerHTML = `
+        <div class="val-item"><div class="val-num">${state.masterTimetable.length}</div><div class="val-label">Records</div></div>
+        <div class="val-item"><div class="val-num">${state.teachers.length}</div><div class="val-label">Teachers</div></div>
+        <div class="val-item"><div class="val-num">${state.classes.size}</div><div class="val-label">Classes</div></div>
+        <div class="val-item"><div class="val-num">${state.subjects.size}</div><div class="val-label">Subjects</div></div>
+        <div class="val-item"><div class="val-num">${freeCount}</div><div class="val-label">Free Periods</div></div>
+      `;
+      renderTimetableTable();
+    }
+  }
+
+  function renderTimetableTable() {
+    const search = (document.getElementById('ttSearch')?.value || '').toLowerCase();
+    const dayFilter = document.getElementById('ttDayFilter')?.value || '';
+    let rows = state.masterTimetable;
+    if (dayFilter) rows = rows.filter(r => r.day === dayFilter);
+    if (search) {
+      rows = rows.filter(r =>
+        r.teacher.toLowerCase().includes(search) ||
+        r.subject.toLowerCase().includes(search) ||
+        r.class.toLowerCase().includes(search) ||
+        String(r.period).includes(search)
+      );
+    }
+
+    const total = rows.length;
+    const pages = Math.ceil(total / state.ttPageSize) || 1;
+    if (state.ttPage > pages) state.ttPage = pages;
+    const start = (state.ttPage - 1) * state.ttPageSize;
+    const pageRows = rows.slice(start, start + state.ttPageSize);
+
+    const tbody = document.querySelector('#ttTable tbody');
+    tbody.innerHTML = pageRows.map(r => `
+      <tr>
+        <td>${esc(r.id)}</td>
+        <td>${esc(r.teacher)}</td>
+        <td>${esc(r.period)}</td>
+        <td>${esc(r.subject)}</td>
+        <td>${esc(r.class)}</td>
+        <td>${DAYS[r.day] || r.day}</td>
+      </tr>
+    `).join('');
+
+    const pag = document.getElementById('ttPagination');
+    if (pages <= 1) {
+      pag.innerHTML = '';
+      return;
+    }
+    let html = '';
+    for (let i = 1; i <= pages; i++) {
+      if (pages > 10 && Math.abs(i - state.ttPage) > 3 && i !== 1 && i !== pages) {
+        if (i === 2 || i === pages - 1) html += `<span>…</span>`;
+        continue;
+      }
+      html += `<button class="${i === state.ttPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+    }
+    pag.innerHTML = html;
+    pag.querySelectorAll('button').forEach(b => {
+      b.addEventListener('click', () => {
+        state.ttPage = Number(b.dataset.page);
+        renderTimetableTable();
+      });
+    });
+  }
+
+  function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s ?? '';
+    return d.innerHTML;
+  }
+
+  // ===== Absent Teachers =====
+  function renderAbsentPage() {
+    const list = document.getElementById('absentTeacherList');
+    const search = (document.getElementById('absentSearch')?.value || '').toLowerCase();
+    let teachers = state.teachers;
+    if (search) teachers = teachers.filter(t => t.toLowerCase().includes(search));
+
+    if (teachers.length === 0) {
+      list.innerHTML = '<p class="empty-state">Master Timetable இல்லை. முதலில் Excel பதிவேற்றவும்.</p>';
+      return;
+    }
+
+    list.innerHTML = teachers.map(t => {
+      const checked = state.absentTeachers.has(t) ? 'checked' : '';
+      const sel = state.absentTeachers.has(t) ? 'selected' : '';
+      return `
+        <label class="teacher-item ${sel}">
+          <input type="checkbox" value="${esc(t)}" ${checked} data-teacher="${esc(t)}" />
+          <span class="t-name">${esc(t)}</span>
+        </label>
+      `;
+    }).join('');
+
+    list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const name = cb.dataset.teacher;
+        if (cb.checked) state.absentTeachers.add(name);
+        else state.absentTeachers.delete(name);
+        save();
+        updateAbsentUI();
+        renderAbsentPeriods();
+      });
+    });
+
+    updateAbsentUI();
+    renderAbsentPeriods();
+  }
+
+  function updateAbsentUI() {
+    const count = state.absentTeachers.size;
+    document.getElementById('selectedAbsentCount').textContent = `${count} selected`;
+    document.getElementById('proceedToRelief').disabled = count === 0;
+    document.querySelectorAll('.teacher-item').forEach(item => {
+      const cb = item.querySelector('input');
+      item.classList.toggle('selected', cb.checked);
+    });
+  }
+
+  function renderAbsentPeriods() {
+    const card = document.getElementById('absentPeriodsCard');
+    const content = document.getElementById('absentPeriodsContent');
+    if (state.absentTeachers.size === 0) {
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = 'block';
+    const day = state.currentDay;
+    const tt = state.masterTimetable.filter(r => (!r.day || r.day === day));
+
+    let html = '';
+    state.absentTeachers.forEach(teacher => {
+      const periods = tt.filter(r => r.teacher === teacher);
+      html += `<h4 style="margin:1rem 0 0.5rem;">${esc(teacher)}</h4>`;
+      html += `<div class="table-wrapper"><table class="data-table"><thead><tr>
+        <th>Period</th><th>Subject</th><th>Class</th><th>Status</th>
+      </tr></thead><tbody>`;
+      periods.sort((a, b) => Number(a.period) - Number(b.period)).forEach(p => {
+        const free = isFree(p.subject, p.class);
+        const status = free
+          ? '<span class="badge badge-free">Free</span>'
+          : '<span class="badge badge-pending">Relief Required</span>';
+        html += `<tr>
+          <td>${esc(p.period)}</td>
+          <td>${esc(p.subject)}</td>
+          <td>${esc(p.class)}</td>
+          <td>${status}</td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+    });
+    content.innerHTML = html;
+  }
+
+  // ===== Relief Logic =====
+  function getTeacherDayLoad(teacher, day) {
+    const tt = state.masterTimetable.filter(r =>
+      r.teacher === teacher && (!r.day || r.day === day) && !isFree(r.subject, r.class)
+    );
+    return tt.length;
+  }
+
+  function getTeacherReliefCount(teacher, day, dateKey) {
+    return state.reliefAssignments.filter(a =>
+      a.reliefTeacher === teacher &&
+      a.day === day &&
+      a.date === dateKey &&
+      a.status !== 'Cancelled'
+    ).length;
+  }
+
+  function getPeriodStatus(teacher, period, day, dateKey) {
+    if (state.absentTeachers.has(teacher)) return 'Absent';
+    const assignment = state.reliefAssignments.find(a =>
+      a.reliefTeacher === teacher &&
+      String(a.period) === String(period) &&
+      a.day === day &&
+      a.date === dateKey &&
+      a.status !== 'Cancelled'
+    );
+    if (assignment) return 'Already Assigned Relief';
+    const tt = state.masterTimetable.find(r =>
+      r.teacher === teacher &&
+      String(r.period) === String(period) &&
+      (!r.day || r.day === day)
+    );
+    if (tt && !isFree(tt.subject, tt.class)) return 'Teaching';
+    return 'Free';
+  }
+
+  function teacherTeachesSubject(teacher, subject, day) {
+    return state.masterTimetable.some(r =>
+      r.teacher === teacher &&
+      (!r.day || r.day === day) &&
+      r.subject === subject &&
+      !isFree(r.subject, r.class)
+    );
+  }
+
+  function teacherTeachesGrade(teacher, cls, day) {
+    // Extract grade number from class e.g. 10A -> 10, 13A -> 13
+    const grade = String(cls).replace(/[^0-9]/g, '');
+    if (!grade) return false;
+    return state.masterTimetable.some(r =>
+      r.teacher === teacher &&
+      (!r.day || r.day === day) &&
+      String(r.class).replace(/[^0-9]/g, '') === grade &&
+      !isFree(r.subject, r.class)
+    );
+  }
+
+  function getCandidates(period, subject, cls, day, dateKey) {
+    const maxRelief = state.settings.maxRelief || 3;
+    const candidates = [];
+
+    state.teachers.forEach(teacher => {
+      if (state.absentTeachers.has(teacher)) return;
+
+      const status = getPeriodStatus(teacher, period, day, dateKey);
+      const regular = getTeacherDayLoad(teacher, day);
+      const relief = getTeacherReliefCount(teacher, day, dateKey);
+      const total = regular + relief;
+      const sameSubject = teacherTeachesSubject(teacher, subject, day);
+      const sameGrade = teacherTeachesGrade(teacher, cls, day);
+
+      let recommendation = 'Not Available';
+      if (status === 'Free') {
+        if (relief >= maxRelief) {
+          recommendation = 'Conflict';
+        } else {
+          // Priority scoring
+          let score = 0;
+          if (status === 'Free') score += 100;
+          if (state.settings.prefLeastLoaded) score += Math.max(0, 20 - total);
+          if (state.settings.prefSameSubject && sameSubject) score += 15;
+          if (state.settings.prefSameGrade && sameGrade) score += 10;
+          if (relief === 0) score += 5;
+          recommendation = score >= 115 ? 'Recommended' : 'Available';
+        }
+      } else if (status === 'Teaching' || status === 'Already Assigned Relief' || status === 'Absent') {
+        recommendation = 'Not Available';
+      }
+
+      candidates.push({
+        teacher,
+        status,
+        regular,
+        relief,
+        total,
+        sameSubject,
+        sameGrade,
+        recommendation,
+        score: recommendation === 'Recommended' ? 2 : recommendation === 'Available' ? 1 : 0
+      });
+    });
+
+    // Sort: Recommended first, then Available, then by load, then same subject
+    candidates.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (a.total !== b.total) return a.total - b.total;
+      if (b.sameSubject !== a.sameSubject) return b.sameSubject - a.sameSubject;
+      if (b.sameGrade !== a.sameGrade) return b.sameGrade - a.sameGrade;
+      return a.teacher.localeCompare(b.teacher, 'ta');
+    });
+
+    return candidates;
+  }
+
+  function getRequiredPeriods() {
+    const day = state.currentDay;
+    const dateKey = todayKey();
+    const tt = state.masterTimetable.filter(r => (!r.day || r.day === day));
+    const required = [];
+
+    state.absentTeachers.forEach(teacher => {
+      tt.filter(r => r.teacher === teacher && !isFree(r.subject, r.class)).forEach(r => {
+        const existing = state.reliefAssignments.find(a =>
+          a.absentTeacher === teacher &&
+          String(a.period) === String(r.period) &&
+          a.day === day &&
+          a.date === dateKey &&
+          a.status !== 'Cancelled'
+        );
+        required.push({
+          absentTeacher: teacher,
+          period: r.period,
+          subject: r.subject,
+          class: r.class,
+          assignment: existing || null
+        });
+      });
+    });
+
+    required.sort((a, b) => Number(a.period) - Number(b.period) || a.absentTeacher.localeCompare(b.absentTeacher, 'ta'));
+    return required;
+  }
+
+  function renderReliefPage() {
+    const content = document.getElementById('reliefContent');
+    if (state.masterTimetable.length === 0) {
+      content.innerHTML = `
+        <div class="empty-state">
+          <p>முதலில் Master Timetable பதிவேற்றவும்.</p>
+          <button class="btn btn-primary" onclick="App.navigate('timetable')">Upload Timetable</button>
+        </div>`;
+      return;
+    }
+    if (state.absentTeachers.size === 0) {
+      content.innerHTML = `
+        <div class="empty-state">
+          <p>வராத ஆசிரியர்களைத் தேர்ந்தெடுக்கவும்.</p>
+          <button class="btn btn-primary" onclick="App.navigate('absent')">வராத ஆசிரியர்கள்</button>
+        </div>`;
+      return;
+    }
+
+    const required = getRequiredPeriods();
+    if (required.length === 0) {
+      content.innerHTML = `<div class="empty-state"><p>வராத ஆசிரியர்களுக்கு Relief தேவையான பாட வேளைகள் இல்லை.</p></div>`;
+      return;
+    }
+
+    const day = state.currentDay;
+    const dateKey = todayKey();
+    let html = '';
+
+    required.forEach((req, idx) => {
+      const assigned = req.assignment;
+      const blockId = assigned
+        ? `relief-assigned-${idx}`
+        : `relief-pending-${idx}`;
+      const pendingClass = assigned ? '' : ' is-pending';
+      html += `<div class="relief-period-block${pendingClass}" id="${blockId}" data-idx="${idx}" data-period="${esc(req.period)}" data-absent="${esc(req.absentTeacher)}">
+        <div class="relief-period-header">
+          <div>
+            <h4>Period ${esc(req.period)}</h4>
+            <div class="relief-meta">
+              Absent: ${esc(req.absentTeacher)} · ${esc(req.subject)} · Class ${esc(req.class)}
+            </div>
+          </div>
+          ${assigned
+            ? (assigned.status === 'Skipped'
+                ? `<span class="badge badge-skipped">Skipped</span>`
+                : `<span class="badge badge-assigned">${esc(assigned.status)}</span>`)
+            : `<span class="badge badge-pending">Pending</span>`}
+        </div>
+        <div class="relief-period-body">`;
+
+      if (assigned) {
+        if (assigned.status === 'Skipped') {
+          html += `
+          <div class="assigned-info" style="background:#f0f0f0;border-color:#ccc;">
+            <div>
+              <strong>பதில் பாடம் ஒதுக்கப்படவில்லை</strong> (Skipped)<br>
+              <small>${new Date(assigned.assignedAt).toLocaleString()}</small>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-sm btn-outline" onclick="App.cancelAssignment('${assigned.id}')">மீண்டும் ஒதுக்குக</button>
+            </div>
+          </div>`;
+        } else {
+          html += `
+          <div class="assigned-info">
+            <div>
+              <strong>Relief Teacher:</strong> ${esc(assigned.reliefTeacher)}<br>
+              <small>Assigned at ${new Date(assigned.assignedAt).toLocaleString()}</small>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-sm btn-outline" onclick="App.editAssignment('${assigned.id}')">மாற்றுக</button>
+              <button class="btn btn-sm btn-danger" onclick="App.cancelAssignment('${assigned.id}')">நீக்குக</button>
+            </div>
+          </div>`;
+        }
+      } else {
+        const candidates = getCandidates(req.period, req.subject, req.class, day, dateKey);
+        const eligible = candidates.filter(c => c.status === 'Free' && c.recommendation !== 'Conflict');
+        const freeCount = candidates.filter(c => c.status === 'Free').length;
+
+        if (eligible.length === 0) {
+          html += `
+            <div class="no-teacher-msg">
+              <h4>இந்த பாடவேளைக்கு தற்போது பொருத்தமான Free Teacher கிடைக்கவில்லை.</h4>
+              <p>Free: ${freeCount} · Teaching: ${candidates.filter(c => c.status === 'Teaching').length} ·
+              Already Relief: ${candidates.filter(c => c.status === 'Already Assigned Relief').length} ·
+              Absent: ${state.absentTeachers.size}</p>
+              <button class="btn btn-sm btn-outline" onclick="App.showAllCandidates(${idx})">Review All Options</button>
+            </div>`;
+        }
+
+        // Filters
+        html += `
+          <div class="candidate-filters" data-req-idx="${idx}">
+            <input type="text" class="search-input cand-search" placeholder="தேடுக Teacher / Subject..." style="max-width:220px;" data-idx="${idx}" />
+            <button class="filter-chip active" data-filter="all" data-idx="${idx}">All Eligible</button>
+            <button class="filter-chip" data-filter="free" data-idx="${idx}">Free Only</button>
+            <button class="filter-chip" data-filter="sameSubject" data-idx="${idx}">Same Subject</button>
+            <button class="filter-chip" data-filter="sameGrade" data-idx="${idx}">Same Grade</button>
+            <button class="filter-chip" data-filter="recommended" data-idx="${idx}">Recommended</button>
+          </div>`;
+
+        // Desktop table
+        html += `<div class="candidate-table-wrap">
+          <table class="candidate-table" id="candTable-${idx}">
+            <thead>
+              <tr>
+                <th>Teacher</th>
+                <th>Period ${esc(req.period)}</th>
+                <th>Regular Today</th>
+                <th>Relief</th>
+                <th>Total</th>
+                <th>Subject</th>
+                <th>Grade</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>`;
+
+        candidates.forEach(c => {
+          const statusBadge = {
+            'Free': 'badge-free',
+            'Teaching': 'badge-teaching',
+            'Already Assigned Relief': 'badge-relief',
+            'Absent': 'badge-absent'
+          }[c.status] || 'badge-absent';
+          const recBadge = {
+            'Recommended': 'badge-recommended',
+            'Available': 'badge-available',
+            'Not Available': 'badge-conflict',
+            'Conflict': 'badge-conflict'
+          }[c.recommendation] || '';
+
+          const canSelect = c.status === 'Free' && c.recommendation !== 'Conflict';
+          html += `<tr data-teacher="${esc(c.teacher)}" data-status="${c.status}" data-rec="${c.recommendation}" data-same-subj="${c.sameSubject}" data-same-grade="${c.sameGrade}">
+            <td><strong>${esc(c.teacher)}</strong></td>
+            <td><span class="badge ${statusBadge}">${c.status}</span></td>
+            <td>${c.regular}</td>
+            <td>${c.relief}</td>
+            <td><strong>${c.total}</strong></td>
+            <td class="${c.sameSubject ? 'match-yes' : 'match-no'}">${c.sameSubject ? '✓' : '—'}</td>
+            <td class="${c.sameGrade ? 'match-yes' : 'match-no'}">${c.sameGrade ? '✓' : '—'}</td>
+            <td><span class="badge ${recBadge}">${c.recommendation}</span></td>
+            <td>
+              ${canSelect
+                ? `<button class="select-btn" onclick="App.confirmAssign('${esc(req.absentTeacher)}','${esc(req.period)}','${esc(req.subject)}','${esc(req.class)}','${esc(c.teacher)}')">Select</button>`
+                : `<button class="select-btn" disabled>N/A</button>`}
+            </td>
+          </tr>`;
+        });
+
+        html += `</tbody></table></div>`;
+
+        // Mobile cards
+        html += `<div class="candidate-cards" id="candCards-${idx}">`;
+        candidates.filter(c => c.status === 'Free').forEach(c => {
+          const canSelect = c.recommendation !== 'Conflict';
+          html += `
+            <div class="candidate-card ${c.recommendation === 'Recommended' ? 'recommended' : ''}" data-teacher="${esc(c.teacher)}" data-status="${c.status}" data-rec="${c.recommendation}" data-same-subj="${c.sameSubject}" data-same-grade="${c.sameGrade}">
+              <div class="cc-name">${esc(c.teacher)}</div>
+              <div class="cc-row"><span>Period ${esc(req.period)}</span><span class="badge badge-free">Free</span></div>
+              <div class="cc-row"><span>Regular Today</span><span>${c.regular}</span></div>
+              <div class="cc-row"><span>Relief</span><span>${c.relief}</span></div>
+              <div class="cc-row"><span>Total Load</span><span>${c.total}</span></div>
+              <div class="cc-row"><span>Same Subject</span><span class="${c.sameSubject ? 'match-yes' : 'match-no'}">${c.sameSubject ? '✓' : '—'}</span></div>
+              <div class="cc-row"><span>Same Grade</span><span class="${c.sameGrade ? 'match-yes' : 'match-no'}">${c.sameGrade ? '✓' : '—'}</span></div>
+              <div class="cc-row"><span>Status</span><span class="badge badge-${c.recommendation === 'Recommended' ? 'recommended' : 'available'}">${c.recommendation}</span></div>
+              ${canSelect
+                ? `<button class="btn btn-primary btn-sm" style="margin-top:0.75rem;width:100%;" onclick="App.confirmAssign('${esc(req.absentTeacher)}','${esc(req.period)}','${esc(req.subject)}','${esc(req.class)}','${esc(c.teacher)}')">Select Teacher</button>`
+                : ''}
+            </div>`;
+        });
+        html += `</div>`;
+
+        // Skip relief option
+        html += `
+          <div style="margin-top:1rem;padding-top:0.75rem;border-top:1px dashed var(--border);text-align:right;">
+            <button class="btn btn-sm btn-outline" onclick="App.skipRelief('${esc(req.absentTeacher)}','${esc(req.period)}','${esc(req.subject)}','${esc(req.class)}')">
+              பதில் பாடம் தேவையில்லை / Skip
+            </button>
+          </div>`;
+      }
+
+      html += `</div></div>`;
+    });
+
+    content.innerHTML = html;
+
+    // Bind filter events
+    content.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const idx = chip.dataset.idx;
+        const parent = chip.closest('.candidate-filters');
+        parent.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        filterCandidates(idx, chip.dataset.filter, parent.querySelector('.cand-search')?.value || '');
+      });
+    });
+    content.querySelectorAll('.cand-search').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const idx = inp.dataset.idx;
+        const activeFilter = inp.closest('.candidate-filters')?.querySelector('.filter-chip.active')?.dataset.filter || 'all';
+        filterCandidates(idx, activeFilter, inp.value);
+      });
+    });
+  }
+
+  function filterCandidates(idx, filter, search) {
+    const q = (search || '').toLowerCase();
+    const rows = document.querySelectorAll(`#candTable-${idx} tbody tr`);
+    const cards = document.querySelectorAll(`#candCards-${idx} .candidate-card`);
+
+    const match = (el) => {
+      const teacher = (el.dataset.teacher || '').toLowerCase();
+      const status = el.dataset.status;
+      const rec = el.dataset.rec;
+      const sameSubj = el.dataset.sameSubj === 'true';
+      const sameGrade = el.dataset.sameGrade === 'true';
+      if (q && !teacher.includes(q)) return false;
+      if (filter === 'free' && status !== 'Free') return false;
+      if (filter === 'sameSubject' && !sameSubj) return false;
+      if (filter === 'sameGrade' && !sameGrade) return false;
+      if (filter === 'recommended' && rec !== 'Recommended') return false;
+      if (filter === 'all' && status !== 'Free' && status !== 'Teaching') {
+        // show free + teaching for awareness, but primarily free
+      }
+      return true;
+    };
+
+    rows.forEach(r => { r.style.display = match(r) ? '' : 'none'; });
+    cards.forEach(c => { c.style.display = match(c) ? '' : 'none'; });
+  }
+
+  function confirmAssign(absentTeacher, period, subject, cls, reliefTeacher) {
+    const day = state.currentDay;
+    const dateKey = todayKey();
+    const regular = getTeacherDayLoad(reliefTeacher, day);
+    const reliefBefore = getTeacherReliefCount(reliefTeacher, day, dateKey);
+    const totalBefore = regular + reliefBefore;
+    const totalAfter = totalBefore + 1;
+
+    // Conflict check
+    const status = getPeriodStatus(reliefTeacher, period, day, dateKey);
+    if (status !== 'Free') {
+      let reason = '';
+      if (status === 'Teaching') {
+        reason = `இந்த ஆசிரியர் தற்போது Period ${period}-ல் பாடம் நடத்துகிறார்.`;
+      } else if (status === 'Already Assigned Relief') {
+        reason = `இந்த ஆசிரியர் ஏற்கனவே Period ${period}-க்கு மற்றொரு பதில் பாடம் பெற்றுள்ளார்.`;
+      } else if (status === 'Absent') {
+        reason = `இந்த ஆசிரியர் இன்று வராத ஆசிரியராகக் குறிக்கப்பட்டுள்ளார்.`;
+      }
+      showModal('Conflict', `<p style="color:var(--danger);">${reason}</p>
+        <p>Cannot assign this teacher without override.</p>`,
+        `<button class="btn btn-outline" onclick="App.hideModal()">Cancel</button>
+         <button class="btn btn-danger" onclick="App.forceAssign('${esc(absentTeacher)}','${esc(period)}','${esc(subject)}','${esc(cls)}','${esc(reliefTeacher)}')">Override & Assign</button>`);
+      return;
+    }
+
+    if (reliefBefore >= (state.settings.maxRelief || 3)) {
+      showModal('Max Relief Limit',
+        `<p>இந்த ஆசிரியர் இன்றைய அதிகபட்ச பதில் பாட எண்ணிக்கையை (${state.settings.maxRelief}) அடைந்துவிட்டார்.</p>`,
+        `<button class="btn btn-outline" onclick="App.hideModal()">Cancel</button>
+         <button class="btn btn-danger" onclick="App.forceAssign('${esc(absentTeacher)}','${esc(period)}','${esc(subject)}','${esc(cls)}','${esc(reliefTeacher)}')">Override & Assign</button>`);
+      return;
+    }
+
+    const body = `
+      <div class="confirm-detail">
+        <span class="label">Absent Teacher</span><span class="value">${esc(absentTeacher)}</span>
+        <span class="label">Period</span><span class="value">${esc(period)}</span>
+        <span class="label">Subject</span><span class="value">${esc(subject)}</span>
+        <span class="label">Class</span><span class="value">${esc(cls)}</span>
+        <span class="label">Selected Relief Teacher</span><span class="value">${esc(reliefTeacher)}</span>
+        <span class="label">Regular Periods Today</span><span class="value">${regular}</span>
+        <span class="label">Relief Before Assignment</span><span class="value">${reliefBefore}</span>
+        <span class="label">Total Before</span><span class="value">${totalBefore}</span>
+        <span class="label">Total After</span><span class="value"><strong>${totalAfter}</strong></span>
+      </div>`;
+    const footer = `
+      <button class="btn btn-outline" onclick="App.hideModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="App.doAssign('${esc(absentTeacher)}','${esc(period)}','${esc(subject)}','${esc(cls)}','${esc(reliefTeacher)}', false)">Confirm Assignment</button>`;
+    showModal('Confirm Relief Assignment', body, footer);
+  }
+
+  function doAssign(absentTeacher, period, subject, cls, reliefTeacher, isOverride) {
+    const day = state.currentDay;
+    const dateKey = todayKey();
+
+    // Remove any existing for this slot
+    state.reliefAssignments = state.reliefAssignments.filter(a =>
+      !(a.absentTeacher === absentTeacher && String(a.period) === String(period) && a.day === day && a.date === dateKey)
+    );
+
+    state.reliefAssignments.push({
+      id: uid(),
+      date: dateKey,
+      day,
+      period,
+      absentTeacher,
+      subject,
+      class: cls,
+      reliefTeacher,
+      status: 'Confirmed',
+      assignedAt: new Date().toISOString(),
+      assignedBy: 'Admin',
+      lastModifiedBy: 'Admin',
+      override: !!isOverride
+    });
+
+    // Update history
+    if (!state.history[dateKey]) {
+      state.history[dateKey] = { day, assignments: [], absentTeachers: [] };
+    }
+    state.history[dateKey].day = day;
+    state.history[dateKey].absentTeachers = [...state.absentTeachers];
+    state.history[dateKey].assignments = state.reliefAssignments.filter(a => a.date === dateKey);
+
+    save();
+    hideModal();
+    toast('பதில் பாட ஒதுக்கீடு வெற்றிகரமாக உறுதிப்படுத்தப்பட்டது.', 'success');
+    renderReliefPage();
+    renderDashboard();
+    // Scroll next pending relief period into center of view
+    setTimeout(() => scrollToNextPending(), 120);
+  }
+
+  function scrollToNextPending() {
+    const pending = document.querySelector('.relief-period-block.is-pending');
+    if (!pending) {
+      const content = document.getElementById('reliefContent');
+      if (content) content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    document.querySelectorAll('.relief-period-block.pending-focus').forEach(el => el.classList.remove('pending-focus'));
+    pending.classList.add('pending-focus');
+    // Center the period HEADER in the viewport
+    const header = pending.querySelector('.relief-period-header') || pending;
+    const headerRect = header.getBoundingClientRect();
+    const absoluteTop = window.pageYOffset + headerRect.top;
+    const targetY = absoluteTop - (window.innerHeight / 2) + (headerRect.height / 2);
+    window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+    setTimeout(() => pending.classList.remove('pending-focus'), 2800);
+  }
+
+  function forceAssign(absentTeacher, period, subject, cls, reliefTeacher) {
+    doAssign(absentTeacher, period, subject, cls, reliefTeacher, true);
+  }
+
+  function skipRelief(absentTeacher, period, subject, cls) {
+    showModal(
+      'பதில் பாடம் தேவையில்லை',
+      `<p>Period <strong>${esc(period)}</strong> – ${esc(absentTeacher)} (${esc(subject)} / ${esc(cls)})</p>
+       <p>இந்த பாடவேளைக்கு பதில் ஆசிரியர் ஒதுக்காமல் விட விரும்புகிறீர்களா?</p>`,
+      `<button class="btn btn-outline" onclick="App.hideModal()">Cancel</button>
+       <button class="btn btn-primary" onclick="App.doSkip('${esc(absentTeacher)}','${esc(period)}','${esc(subject)}','${esc(cls)}')">உறுதிப்படுத்துக / Confirm Skip</button>`
+    );
+  }
+
+  function doSkip(absentTeacher, period, subject, cls) {
+    const day = state.currentDay;
+    const dateKey = todayKey();
+    state.reliefAssignments = state.reliefAssignments.filter(a =>
+      !(a.absentTeacher === absentTeacher && String(a.period) === String(period) && a.day === day && a.date === dateKey)
+    );
+    state.reliefAssignments.push({
+      id: uid(),
+      date: dateKey,
+      day,
+      period,
+      absentTeacher,
+      subject,
+      class: cls,
+      reliefTeacher: '-',
+      status: 'Skipped',
+      assignedAt: new Date().toISOString(),
+      assignedBy: 'Admin',
+      lastModifiedBy: 'Admin',
+      override: false
+    });
+    if (!state.history[dateKey]) {
+      state.history[dateKey] = { day, assignments: [], absentTeachers: [] };
+    }
+    state.history[dateKey].day = day;
+    state.history[dateKey].absentTeachers = [...state.absentTeachers];
+    state.history[dateKey].assignments = state.reliefAssignments.filter(a => a.date === dateKey);
+    save();
+    hideModal();
+    toast('பதில் பாடம் ஒதுக்கப்படவில்லை (Skipped)', 'warning');
+    renderReliefPage();
+    renderDashboard();
+    setTimeout(() => scrollToNextPending(), 120);
+  }
+
+  function cancelAssignment(id) {
+    showModal('Cancel Assignment',
+      '<p>இந்த பதில் பாட ஒதுக்கீட்டை நீக்க விரும்புகிறீர்களா?</p>',
+      `<button class="btn btn-outline" onclick="App.hideModal()">No</button>
+       <button class="btn btn-danger" onclick="App.doCancel('${id}')">Yes, Cancel</button>`);
+  }
+
+  function doCancel(id) {
+    const a = state.reliefAssignments.find(x => x.id === id);
+    if (a) {
+      a.status = 'Cancelled';
+      a.lastModifiedBy = 'Admin';
+      const dateKey = a.date;
+      if (state.history[dateKey]) {
+        state.history[dateKey].assignments = state.reliefAssignments.filter(x => x.date === dateKey);
+      }
+      save();
+      toast('Assignment cancelled', 'warning');
+      hideModal();
+      renderReliefPage();
+      renderDashboard();
+    }
+  }
+
+  function editAssignment(id) {
+    const a = state.reliefAssignments.find(x => x.id === id);
+    if (!a) return;
+    // Cancel and re-open selection
+    a.status = 'Cancelled';
+    save();
+    renderReliefPage();
+    toast('Select a new relief teacher', 'info');
+  }
+
+  // ===== Teacher Report =====
+  function renderTeacherReport() {
+    const content = document.getElementById('teacherReportContent');
+    const dateKey = todayKey();
+    const day = state.currentDay;
+    const assignments = state.reliefAssignments.filter(a =>
+      a.date === dateKey && a.day === day && a.status !== 'Cancelled'
+    );
+
+    if (assignments.length === 0) {
+      content.innerHTML = '<div class="empty-state"><p>இன்று பதில் பாட ஒதுக்கீடுகள் இல்லை.</p></div>';
+      return;
+    }
+
+    const byTeacher = {};
+    assignments.forEach(a => {
+      if (!byTeacher[a.reliefTeacher]) byTeacher[a.reliefTeacher] = [];
+      byTeacher[a.reliefTeacher].push(a);
+    });
+
+    const search = (document.getElementById('teacherReportSearch')?.value || '').toLowerCase();
+    let html = '';
+    Object.keys(byTeacher).sort((a, b) => a.localeCompare(b, 'ta')).forEach(t => {
+      if (search && !t.toLowerCase().includes(search)) return;
+      html += `<h4 style="margin:1.25rem 0 0.5rem;">${esc(t)}</h4>
+        <div class="table-wrapper"><table class="data-table">
+        <thead><tr><th>Period</th><th>Class</th><th>Subject</th><th>Absent Teacher</th><th>Status</th></tr></thead>
+        <tbody>`;
+      byTeacher[t].sort((a, b) => Number(a.period) - Number(b.period)).forEach(a => {
+        html += `<tr>
+          <td>${esc(a.period)}</td>
+          <td>${esc(a.class)}</td>
+          <td>${esc(a.subject)}</td>
+          <td>${esc(a.absentTeacher)}</td>
+          <td><span class="badge badge-assigned">${esc(a.status)}</span></td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+    });
+    content.innerHTML = html || '<div class="empty-state"><p>No matching teachers.</p></div>';
+  }
+
+  // ===== Reports =====
+  function runReport(type) {
+    const output = document.getElementById('reportOutput');
+    output.style.display = 'block';
+    const dateKey = todayKey();
+    const day = state.currentDay;
+    const assignments = state.reliefAssignments.filter(a =>
+      a.date === dateKey && a.day === day && a.status !== 'Cancelled'
+    );
+
+    let html = '';
+    if (type === 'daily') {
+      html = `<h4>Daily Relief Report – ${formatDate(state.currentDate)} (${DAYS[day]})</h4>
+        <div class="table-wrapper"><table class="data-table">
+        <thead><tr><th>Period</th><th>Absent Teacher</th><th>Subject</th><th>Class</th><th>Relief Teacher</th><th>Status</th></tr></thead>
+        <tbody>`;
+      if (assignments.length === 0) {
+        html += '<tr><td colspan="6">No assignments</td></tr>';
+      } else {
+        assignments.sort((a, b) => Number(a.period) - Number(b.period)).forEach(a => {
+          html += `<tr>
+            <td>${esc(a.period)}</td><td>${esc(a.absentTeacher)}</td>
+            <td>${esc(a.subject)}</td><td>${esc(a.class)}</td>
+            <td>${esc(a.reliefTeacher)}</td>
+            <td><span class="badge badge-assigned">${esc(a.status)}</span></td>
+          </tr>`;
+        });
+      }
+      html += '</tbody></table></div>';
+    } else if (type === 'teacher') {
+      renderTeacherReport();
+      navigate('teacher-report');
+      return;
+    } else if (type === 'absent') {
+      html = `<h4>வராத ஆசிரியர் வாரியான அறிக்கை</h4>
+        <div class="table-wrapper"><table class="data-table">
+        <thead><tr><th>Absent Teacher</th><th>Period</th><th>Class</th><th>Subject</th><th>Relief Teacher</th></tr></thead>
+        <tbody>`;
+      assignments.sort((a, b) => a.absentTeacher.localeCompare(b.absentTeacher, 'ta') || Number(a.period) - Number(b.period))
+        .forEach(a => {
+          html += `<tr>
+            <td>${esc(a.absentTeacher)}</td><td>${esc(a.period)}</td>
+            <td>${esc(a.class)}</td><td>${esc(a.subject)}</td>
+            <td>${esc(a.reliefTeacher)}</td>
+          </tr>`;
+        });
+      if (assignments.length === 0) html += '<tr><td colspan="5">No data</td></tr>';
+      html += '</tbody></table></div>';
+    } else if (type === 'period') {
+      html = `<h4>பாடவேளை வாரியான பதில் பாட அறிக்கை</h4>
+        <div class="filter-bar"><label>Period: </label>
+        <select id="periodReportSelect">${[...Array(state.settings.numPeriods)].map((_, i) =>
+          `<option value="${i + 1}">${i + 1}</option>`).join('')}</select>
+        <button class="btn btn-sm btn-primary" id="runPeriodReport">Show</button></div>
+        <div id="periodReportResult"></div>`;
+      setTimeout(() => {
+        document.getElementById('runPeriodReport')?.addEventListener('click', () => {
+          const p = document.getElementById('periodReportSelect').value;
+          const filtered = assignments.filter(a => String(a.period) === String(p));
+          let h = `<div class="table-wrapper"><table class="data-table">
+            <thead><tr><th>Absent Teacher</th><th>Class</th><th>Subject</th><th>Relief Teacher</th><th>Status</th></tr></thead><tbody>`;
+          filtered.forEach(a => {
+            h += `<tr><td>${esc(a.absentTeacher)}</td><td>${esc(a.class)}</td>
+              <td>${esc(a.subject)}</td><td>${esc(a.reliefTeacher)}</td>
+              <td>${esc(a.status)}</td></tr>`;
+          });
+          if (filtered.length === 0) h += '<tr><td colspan="5">No assignments for this period</td></tr>';
+          h += '</tbody></table></div>';
+          document.getElementById('periodReportResult').innerHTML = h;
+        });
+      }, 50);
+    } else if (type === 'workload') {
+      const day = state.currentDay;
+      const teachers = state.teachers;
+      html = `<h4>Teacher Workload Report</h4>
+        <div class="table-wrapper"><table class="data-table">
+        <thead><tr><th>Teacher</th><th>Regular Periods</th><th>Relief Periods</th><th>Total</th></tr></thead>
+        <tbody>`;
+      teachers.forEach(t => {
+        const reg = getTeacherDayLoad(t, day);
+        const rel = getTeacherReliefCount(t, day, dateKey);
+        html += `<tr><td>${esc(t)}</td><td>${reg}</td><td>${rel}</td><td><strong>${reg + rel}</strong></td></tr>`;
+      });
+      html += '</tbody></table></div>';
+    } else if (type === 'pending') {
+      const required = getRequiredPeriods().filter(r => !r.assignment);
+      html = `<h4>Pending Relief Report</h4>
+        <div class="table-wrapper"><table class="data-table">
+        <thead><tr><th>Period</th><th>Absent Teacher</th><th>Subject</th><th>Class</th></tr></thead>
+        <tbody>`;
+      required.forEach(r => {
+        html += `<tr><td>${esc(r.period)}</td><td>${esc(r.absentTeacher)}</td>
+          <td>${esc(r.subject)}</td><td>${esc(r.class)}</td></tr>`;
+      });
+      if (required.length === 0) html += '<tr><td colspan="4">No pending periods</td></tr>';
+      html += '</tbody></table></div>';
+    } else if (type === 'conflict') {
+      html = `<h4>Conflict Report</h4><p>Conflicts are prevented at assignment time. Override assignments:</p>
+        <div class="table-wrapper"><table class="data-table">
+        <thead><tr><th>Period</th><th>Absent</th><th>Relief</th><th>Override</th></tr></thead>
+        <tbody>`;
+      const overrides = assignments.filter(a => a.override);
+      overrides.forEach(a => {
+        html += `<tr><td>${esc(a.period)}</td><td>${esc(a.absentTeacher)}</td>
+          <td>${esc(a.reliefTeacher)}</td><td>Yes</td></tr>`;
+      });
+      if (overrides.length === 0) html += '<tr><td colspan="4">No override assignments</td></tr>';
+      html += '</tbody></table></div>';
+    } else if (type === 'history') {
+      navigate('history');
+      return;
+    }
+
+    html += `<div class="btn-group" style="margin-top:1rem;">
+      <button class="btn btn-outline" onclick="App.exportReportExcel('${type}')">📊 Export Excel</button>
+      <button class="btn btn-outline" onclick="App.printCurrentReport()">🖨️ Print</button>
+    </div>`;
+    output.innerHTML = html;
+  }
+
+  // ===== History =====
+  function renderHistory() {
+    const list = document.getElementById('historyList');
+    const keys = Object.keys(state.history).sort().reverse();
+    if (keys.length === 0) {
+      list.innerHTML = '<div class="empty-state"><p>வரலாற்று பதிவுகள் இல்லை.</p></div>';
+      return;
+    }
+    list.innerHTML = keys.map(k => {
+      const h = state.history[k];
+      const count = (h.assignments || []).filter(a => a.status !== 'Cancelled').length;
+      return `<div class="history-item" data-date="${k}">
+        <div>
+          <strong>${k}</strong> – ${DAYS[h.day] || h.day}
+          <br><small>${count} assignments · ${(h.absentTeachers || []).length} absent</small>
+        </div>
+        <button class="btn btn-sm btn-outline">View</button>
+      </div>`;
+    }).join('');
+
+    list.querySelectorAll('.history-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const date = item.dataset.date;
+        const h = state.history[date];
+        const detail = document.getElementById('historyDetail');
+        detail.style.display = 'block';
+        let html = `<h4>${date} – ${DAYS[h.day] || h.day}</h4>
+          <p>Absent: ${(h.absentTeachers || []).map(esc).join(', ') || '—'}</p>
+          <div class="table-wrapper"><table class="data-table">
+          <thead><tr><th>Period</th><th>Absent</th><th>Subject</th><th>Class</th><th>Relief</th><th>Status</th></tr></thead>
+          <tbody>`;
+        (h.assignments || []).filter(a => a.status !== 'Cancelled').forEach(a => {
+          html += `<tr>
+            <td>${esc(a.period)}</td><td>${esc(a.absentTeacher)}</td>
+            <td>${esc(a.subject)}</td><td>${esc(a.class)}</td>
+            <td>${esc(a.reliefTeacher)}</td><td>${esc(a.status)}</td>
+          </tr>`;
+        });
+        html += '</tbody></table></div>';
+        detail.innerHTML = html;
+      });
+    });
+  }
+
+  // ===== Settings =====
+  function renderSettings() {
+    document.getElementById('schoolName').value = state.settings.schoolName || '';
+    document.getElementById('schoolAddress').value = state.settings.schoolAddress || '';
+    document.getElementById('principalName').value = state.settings.principalName || '';
+    document.getElementById('deputyPrincipalName').value = state.settings.deputyPrincipalName || '';
+    document.getElementById('numPeriods').value = state.settings.numPeriods || 8;
+    document.getElementById('maxRelief').value = state.settings.maxRelief || 3;
+    document.getElementById('prefSameSubject').checked = !!state.settings.prefSameSubject;
+    document.getElementById('prefSameGrade').checked = !!state.settings.prefSameGrade;
+    document.getElementById('prefLeastLoaded').checked = !!state.settings.prefLeastLoaded;
+    // Logo preview
+    const wrap = document.getElementById('logoPreviewWrap');
+    const img = document.getElementById('logoPreview');
+    if (state.settings.schoolLogo) {
+      img.src = state.settings.schoolLogo;
+      wrap.style.display = 'block';
+    } else {
+      img.removeAttribute('src');
+      wrap.style.display = 'none';
+    }
+  }
+
+  function saveSettings(e) {
+    e.preventDefault();
+    state.settings.schoolName = document.getElementById('schoolName').value;
+    state.settings.schoolAddress = document.getElementById('schoolAddress').value;
+    state.settings.principalName = document.getElementById('principalName').value;
+    state.settings.deputyPrincipalName = document.getElementById('deputyPrincipalName').value;
+    state.settings.numPeriods = Number(document.getElementById('numPeriods').value) || 8;
+    state.settings.maxRelief = Number(document.getElementById('maxRelief').value) || 3;
+    state.settings.prefSameSubject = document.getElementById('prefSameSubject').checked;
+    state.settings.prefSameGrade = document.getElementById('prefSameGrade').checked;
+    state.settings.prefLeastLoaded = document.getElementById('prefLeastLoaded').checked;
+    // schoolLogo already set by file input handler
+    save();
+    toast('Settings saved', 'success');
+  }
+
+  function handleLogoUpload(file) {
+    if (!file) return;
+    if (file.size > 1.5 * 1024 * 1024) {
+      toast('Logo 1.5 MB-க்கு குறைவாக இருக்க வேண்டும்', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      state.settings.schoolLogo = ev.target.result;
+      const wrap = document.getElementById('logoPreviewWrap');
+      const img = document.getElementById('logoPreview');
+      img.src = state.settings.schoolLogo;
+      wrap.style.display = 'block';
+      save();
+      toast('Logo சேர்க்கப்பட்டது', 'success');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeLogo() {
+    state.settings.schoolLogo = '';
+    const wrap = document.getElementById('logoPreviewWrap');
+    const img = document.getElementById('logoPreview');
+    img.removeAttribute('src');
+    wrap.style.display = 'none';
+    const inp = document.getElementById('schoolLogoFile');
+    if (inp) inp.value = '';
+    save();
+    toast('Logo நீக்கப்பட்டது', 'warning');
+  }
+
+  // ===== Print & Export =====
+  function printReliefTimetable() {
+    const dateKey = todayKey();
+    const day = state.currentDay;
+    const assignments = state.reliefAssignments.filter(a =>
+      a.date === dateKey && a.day === day && a.status !== 'Cancelled'
+    );
+    const school = state.settings.schoolName || 'School';
+    const logo = state.settings.schoolLogo || '';
+    const logoHtml = logo
+      ? `<img src="${logo}" alt="Logo" style="max-height:70px;max-width:120px;margin-bottom:0.5rem;" />`
+      : '';
+    let html = `
+      <style>
+        @page { size: A4 landscape; margin: 12mm; }
+        .print-relief-table { width: 100%; border-collapse: collapse; font-size: 11pt; }
+        .print-relief-table th, .print-relief-table td {
+          border: 1px solid #333; padding: 8px 10px; text-align: left; vertical-align: middle;
+        }
+        .print-relief-table th { background: #eee; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .print-sig-col { min-width: 140px; height: 36px; }
+      </style>
+      <div style="text-align:center;margin-bottom:1.25rem;">
+        ${logoHtml}
+        <h2 style="margin:0;">${esc(school)}</h2>
+        <h3 style="margin:0.3rem 0;">ஆசிரியர் பதில் பாட ஒழுங்கு</h3>
+        <p>Date: ${dateKey} &nbsp;|&nbsp; Day: ${DAYS[day] || day}</p>
+      </div>
+      <table class="print-relief-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th>Absent Teacher</th>
+            <th>Subject</th>
+            <th>Class</th>
+            <th>Relief Teacher</th>
+            <th>Status</th>
+            <th>Signature / கையொப்பம்</th>
+          </tr>
+        </thead>
+        <tbody>`;
+    if (assignments.length === 0) {
+      html += '<tr><td colspan="7" style="text-align:center;">No relief assignments</td></tr>';
+    } else {
+      assignments.sort((a, b) => Number(a.period) - Number(b.period)).forEach(a => {
+        html += `<tr>
+          <td>${esc(a.period)}</td>
+          <td>${esc(a.absentTeacher)}</td>
+          <td>${esc(a.subject)}</td>
+          <td>${esc(a.class)}</td>
+          <td>${esc(a.reliefTeacher)}</td>
+          <td>${esc(a.status)}</td>
+          <td class="print-sig-col">&nbsp;</td>
+        </tr>`;
+      });
+    }
+    html += `</tbody></table>
+      <div style="margin-top:2.2rem;display:flex;justify-content:space-between;font-size:0.9rem;flex-wrap:wrap;gap:1rem;">
+        <div>Prepared by: __________________</div>
+        <div>Checked by: __________________</div>
+        <div>Principal / Deputy Principal: __________________</div>
+      </div>
+      <div style="margin-top:1rem;">Date: __________________</div>
+      <div style="margin-top:1.5rem;text-align:center;font-size:0.75rem;color:#666;">
+        App designed by M.Nishanthan
+      </div>`;
+
+    const printArea = document.getElementById('printArea');
+    printArea.innerHTML = html;
+    printArea.style.display = 'block';
+    window.print();
+    setTimeout(() => { printArea.style.display = 'none'; }, 500);
+  }
+
+  function exportReportExcel(type) {
+    const dateKey = todayKey();
+    const day = state.currentDay;
+    const assignments = state.reliefAssignments.filter(a =>
+      a.date === dateKey && a.day === day && a.status !== 'Cancelled'
+    );
+    const rows = [
+      ['Period', 'Absent Teacher', 'Subject', 'Class', 'Relief Teacher', 'Status']
+    ];
+    assignments.forEach(a => {
+      rows.push([a.period, a.absentTeacher, a.subject, a.class, a.reliefTeacher, a.status]);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Relief');
+    XLSX.writeFile(wb, `Relief_Report_${dateKey}.xlsx`);
+    toast('Excel exported', 'success');
+  }
+
+  function printCurrentReport() {
+    const output = document.getElementById('reportOutput');
+    if (!output || output.style.display === 'none') return;
+    const printArea = document.getElementById('printArea');
+    printArea.innerHTML = `
+      <div style="text-align:center;margin-bottom:1rem;">
+        <h2>${esc(state.settings.schoolName || 'School')}</h2>
+        <h3>ஆசிரியர் பதில் பாட அறிக்கை</h3>
+      </div>
+      ${output.innerHTML}
+      <div style="margin-top:2rem;text-align:center;font-size:0.75rem;">App designed by M.Nishanthan</div>`;
+    printArea.style.display = 'block';
+    window.print();
+    setTimeout(() => { printArea.style.display = 'none'; }, 500);
+  }
+
+  function exportTeacherExcel() {
+    const dateKey = todayKey();
+    const day = state.currentDay;
+    const assignments = state.reliefAssignments.filter(a =>
+      a.date === dateKey && a.day === day && a.status !== 'Cancelled'
+    );
+    const rows = [['Relief Teacher', 'Period', 'Class', 'Subject', 'Absent Teacher']];
+    assignments.sort((a, b) => a.reliefTeacher.localeCompare(b.reliefTeacher, 'ta') || Number(a.period) - Number(b.period))
+      .forEach(a => {
+        rows.push([a.reliefTeacher, a.period, a.class, a.subject, a.absentTeacher]);
+      });
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Teacher Relief');
+    XLSX.writeFile(wb, `Teacher_Relief_${dateKey}.xlsx`);
+    toast('Excel exported', 'success');
+  }
+
+  // ===== Init =====
+  function init() {
+    load();
+    state.currentDate = new Date();
+    document.getElementById('currentDate').textContent = formatDate(state.currentDate);
+
+    // Set day selector based on today
+    const dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const todayName = dayMap[state.currentDate.getDay()];
+    if (DAYS[todayName]) {
+      state.currentDay = todayName;
+      document.getElementById('workingDay').value = todayName;
+    }
+
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigate(item.dataset.page);
+      });
+    });
+
+    document.getElementById('menuToggle')?.addEventListener('click', () => {
+      document.getElementById('sidebar').classList.add('open');
+    });
+    document.getElementById('sidebarClose')?.addEventListener('click', () => {
+      document.getElementById('sidebar').classList.remove('open');
+    });
+
+    document.getElementById('workingDay').addEventListener('change', (e) => {
+      state.currentDay = e.target.value;
+      save();
+      if (state.currentPage === 'dashboard') renderDashboard();
+      else if (state.currentPage === 'absent') renderAbsentPage();
+      else if (state.currentPage === 'relief') renderReliefPage();
+      else if (state.currentPage === 'teacher-report') renderTeacherReport();
+    });
+
+    // Upload
+    const fileInput = document.getElementById('excelFile');
+    const zone = document.getElementById('uploadZone');
+    fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+    zone.addEventListener('click', (e) => {
+      if (e.target.tagName !== 'BUTTON') fileInput.click();
+    });
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+
+    document.getElementById('ttSearch')?.addEventListener('input', () => {
+      state.ttPage = 1;
+      renderTimetableTable();
+    });
+    document.getElementById('ttDayFilter')?.addEventListener('change', () => {
+      state.ttPage = 1;
+      renderTimetableTable();
+    });
+
+    // Absent
+    document.getElementById('absentSearch')?.addEventListener('input', renderAbsentPage);
+    document.getElementById('selectAllAbsent')?.addEventListener('click', () => {
+      state.teachers.forEach(t => state.absentTeachers.add(t));
+      save();
+      renderAbsentPage();
+    });
+    document.getElementById('clearAllAbsent')?.addEventListener('click', () => {
+      state.absentTeachers.clear();
+      save();
+      renderAbsentPage();
+    });
+    document.getElementById('proceedToRelief')?.addEventListener('click', () => navigate('relief'));
+
+    // Relief
+    document.getElementById('refreshRelief')?.addEventListener('click', () => renderReliefPage());
+    document.getElementById('printReliefBtn')?.addEventListener('click', printReliefTimetable);
+
+    // Teacher report
+    document.getElementById('teacherReportSearch')?.addEventListener('input', renderTeacherReport);
+    document.getElementById('exportTeacherExcel')?.addEventListener('click', exportTeacherExcel);
+    document.getElementById('printTeacherReport')?.addEventListener('click', () => {
+      const content = document.getElementById('teacherReportContent');
+      const printArea = document.getElementById('printArea');
+      printArea.innerHTML = `
+        <div style="text-align:center;margin-bottom:1rem;">
+          <h2>${esc(state.settings.schoolName || 'School')}</h2>
+          <h3>ஆசிரியர் வாரியான பதில் பாட அட்டவணை</h3>
+          <p>${todayKey()} – ${DAYS[state.currentDay]}</p>
+        </div>
+        ${content.innerHTML}
+        <div style="margin-top:2rem;text-align:center;font-size:0.75rem;">App designed by M.Nishanthan</div>`;
+      printArea.style.display = 'block';
+      window.print();
+      setTimeout(() => { printArea.style.display = 'none'; }, 500);
+    });
+
+    // Reports
+    document.querySelectorAll('.report-card').forEach(card => {
+      card.addEventListener('click', () => runReport(card.dataset.report));
+    });
+
+    // Settings
+    document.getElementById('settingsForm')?.addEventListener('submit', saveSettings);
+    document.getElementById('schoolLogoFile')?.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) handleLogoUpload(e.target.files[0]);
+    });
+    document.getElementById('removeLogoBtn')?.addEventListener('click', removeLogo);
+
+    // Modal
+    document.getElementById('modalClose')?.addEventListener('click', hideModal);
+    document.getElementById('modalOverlay')?.addEventListener('click', (e) => {
+      if (e.target.id === 'modalOverlay') hideModal();
+    });
+
+    navigate('dashboard');
+  }
+
+  // Public API
+  return {
+    init,
+    navigate,
+    confirmAssign,
+    doAssign,
+    forceAssign,
+    skipRelief,
+    doSkip,
+    cancelAssignment,
+    doCancel,
+    editAssignment,
+    hideModal,
+    exportReportExcel,
+    printCurrentReport,
+    showAllCandidates: (idx) => {
+      // Show all including non-free for manual review
+      const table = document.getElementById(`candTable-${idx}`);
+      if (table) {
+        table.querySelectorAll('tbody tr').forEach(r => r.style.display = '');
+      }
+      toast('Showing all teachers for manual review', 'info');
+    }
+  };
+})();
+
+document.addEventListener('DOMContentLoaded', App.init);
+
+  </script>
+</body>
+</html>
